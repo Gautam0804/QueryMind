@@ -1,0 +1,23 @@
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: querymind-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: querymind
+      POSTGRES_USER: querymind_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+       - "127.0.0.1:15433:5432"
+    volumes:
+      - querymind_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U querymind_admin -d querymind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  querymind_data:

@@ -281,8 +281,12 @@ No license has been selected yet. Add a `LICENSE` file (for example MIT) and upd
 
 ## 👤 Author
 
-**Gautam**
-GitHub: [@Gautam0804](https://github.com/Gautam0804)
+**Gautam Kumar Yadav** · Full-Stack & AI Engineer
+
+[![GitHub](https://img.shields.io/badge/GitHub-Gautam0804-181717?style=flat&logo=github&logoColor=white)](https://github.com/Gautam0804)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Gautam_Yadav-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gautam-yadav-10922726b)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-000000?style=flat&logo=vercel&logoColor=white)](https://gautam-portfolio-self.vercel.app/)
+[![Email](https://img.shields.io/badge/Email-gautamcodesin@gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:gautamcodesin@gmail.com)
 
 ---
 

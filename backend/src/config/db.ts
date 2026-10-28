@@ -26,13 +26,17 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error('DB_PORT must be a valid port number.');
 }
 
+
 const commonConfig = {
   host: process.env.DB_HOST,
   port,
   database: process.env.DB_NAME,
-  connectionTimeoutMillis: 3000,
+  connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 10000,
   max: 5,
+  ssl: {
+    rejectUnauthorized: true,
+  },
 };
 
 // Read-only connection for schema inspection and query execution.

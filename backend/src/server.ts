@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import { pool, historyPool } from './config/db';
+import { pool, historyPool, authPool } from './config/db';
 import queryRouter from './routes/query';
 import analyticsRouter from './routes/analytics';
 import queryHistoryRouter from './routes/queryHistory';
@@ -13,7 +13,8 @@ import { getSchemaTables } from './services/schema';
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
-const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+const frontendUrl =
+  process.env.FRONTEND_URL ?? 'http://localhost:3000';
 
 app.disable('x-powered-by');
 
@@ -30,7 +31,7 @@ app.use(cookieParser());
 // Authentication
 app.use('/api/auth', authRouter);
 
-// Health checks
+// General health check
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -38,6 +39,7 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+// Database health check
 app.get('/api/db-health', async (_req, res) => {
   try {
     await pool.query('SELECT 1 AS connected');
@@ -46,7 +48,9 @@ app.get('/api/db-health', async (_req, res) => {
       status: 'ok',
       database: 'connected',
     });
-  } catch {
+  } catch (error) {
+    console.error('[DB Health] Connection failed:', error);
+
     return res.status(503).json({
       status: 'error',
       database: 'unavailable',
@@ -59,8 +63,11 @@ app.get('/api/db-health', async (_req, res) => {
 app.get('/api/schema', async (_req, res) => {
   try {
     const tables = await getSchemaTables();
+
     return res.json({ tables });
-  } catch {
+  } catch (error) {
+    console.error('[Schema] Failed to retrieve schema:', error);
+
     return res.status(503).json({
       error: 'Unable to retrieve database schema.',
     });
@@ -79,7 +86,7 @@ app.use((_req, res) => {
   });
 });
 
-// Error handler
+// Global error handler
 app.use(
   (
     err: unknown,
@@ -101,7 +108,7 @@ app.use(
 );
 
 const server = app.listen(port, () => {
-  console.log(`QueryMind API running at http://localhost:${port}`);
+  console.log(`QueryMind API running on port ${port}`);
 });
 
 let shuttingDown = false;
@@ -114,6 +121,7 @@ async function shutdown() {
     await Promise.allSettled([
       pool.end(),
       historyPool.end(),
+      authPool.end(),
     ]);
 
     process.exit(0);

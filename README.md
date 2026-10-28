@@ -1,756 +1,379 @@
-# QueryMind — AI-Powered Text-to-SQL Analytics Assistant
+QueryMind — AI-Powered Text-to-SQL Analytics Assistant
+QueryMind is an AI-powered analytics assistant designed to help users explore relational data using natural-language questions instead of writing SQL manually. It combines a Next.js dashboard, a TypeScript/Node.js API, PostgreSQL, schema-aware context, and an LLM-powered SQL-generation workflow.
+Project status: In development. Core frontend, backend, and database foundations have been built. Verify all deployment settings, tests, and security controls in the target environment before production use.
 
-QueryMind is an AI-powered analytics assistant that enables users to interact with relational databases using natural language. Instead of manually writing SQL queries, users can ask questions in plain English and receive query results, data visualizations, and actionable insights through an interactive dashboard.
+Repository: https://github.com/Gautam0804/QueryMind
+Table of Contents
+- Overview
+- Features
+- Tech Stack
+- Architecture
+- Query Lifecycle
+- Repository Structure
+- Prerequisites
+- Local Setup
+- Environment Variables
+- Database
+- Running the Application
+- Available Scripts
+- API
+- Security Considerations
+- Troubleshooting
+- Roadmap
+- Contributing
+- License
+Overview
+Traditional analytics often requires users to understand SQL, know the database schema, and build reports manually. QueryMind aims to make data exploration more accessible by allowing users to ask questions in plain language and view structured results in an analytics dashboard.
 
-The project combines Large Language Models (LLMs), schema-aware SQL generation, PostgreSQL, and interactive visualizations to make database analytics more accessible, intuitive, and efficient.
+Example questions include:
+- "How many customers are in the database?"
+- "Show the latest orders."
+- "Which products have the most order items?"
+- "Summarize orders by month."
+These are illustrative prompts. Whether a prompt succeeds depends on the available schema, data, configured LLM provider, and implemented application behavior.
+Features
+Natural-language analytics
+Submit a question in plain language and use the application's query workflow to explore relational data.
+LLM-assisted SQL generation
+The backend includes SQL-generation and schema-context service modules. The configured LLM provider and its environment settings must be present for generation to work.
+Schema knowledge and retrieval
+The project includes schema-related knowledge components intended to help ground generated queries in the database structure.
+SQL safety layer
+The backend includes SQL-safety and query-service modules. Generated SQL must be treated as untrusted input and validated before execution.
+Interactive dashboard
+The frontend is built with Next.js and React. It includes dashboard UI areas for query workflows, results, charts, history, saved queries, navigation, and authentication.
+Data visualization
+Recharts is part of the frontend stack for displaying supported query results as charts.
+PostgreSQL database
+The development database contains relational analytics tables and schema-knowledge tables initialized from SQL scripts.
+Authentication and API routes
+The backend includes authentication, query, analytics, and query-history route modules. Review the actual route definitions for exact endpoints and request/response formats.
+Tech Stack
+Layer	Technologies
+Frontend	Next.js, React, TypeScript
+Styling	CSS and Tailwind utility classes where configured
+Charts	Recharts
+Backend	Node.js, Express.js, TypeScript
+Database	PostgreSQL
+Vector extension support	pgvector
+SQL parsing	node-sql-parser
+Validation	Zod
+Database client	pg
+AI integration	Gemini configuration is present in the backend; check environment configuration for the active model
+Local infrastructure	Docker Compose
+Development tools	npm, Git, Postman
 
-> **Project status:** In development. Core dashboard and database infrastructure have been started; end-to-end functionality and production readiness still require verification.
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Tech Stack](#tech-stack)
-- [System Architecture](#system-architecture)
-- [How It Works](#how-it-works)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Database Setup](#database-setup)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Security](#security)
-- [Example Use Cases](#example-use-cases)
-- [Troubleshooting](#troubleshooting)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## Overview
-
-Traditional business intelligence tools often require SQL knowledge, manual report creation, or complex dashboard configurations.
-
-QueryMind aims to simplify this process by allowing users to ask questions such as:
-
-- What is the total revenue generated?
-- Which products are performing best?
-- How many orders were placed during a particular period?
-- Which customers have the highest purchase value?
-- Show monthly sales trends.
-- Compare product performance across categories.
-
-QueryMind is designed to translate these questions into SQL, execute approved queries against a relational database, and present the results in a readable format.
-
-### Project Goals
-
-- Enable natural-language access to structured data.
-- Generate SQL using database schema context.
-- Execute queries with appropriate safety restrictions.
-- Display results through tables and interactive charts.
-- Maintain query history and reusable saved queries.
-- Provide a clean, responsive analytics dashboard.
-
----
-
-## Key Features
-
-### 1. Natural-Language Database Queries
-
-Allow users to express analytical questions in everyday language rather than writing SQL manually.
-
-**Example:**
-
-User question:
-
-> Show the top five products by sales.
-
-Expected workflow:
-
-1. Understand the question.
-2. Retrieve relevant schema information.
-3. Generate an appropriate SQL query.
-4. Validate the generated query.
-5. Execute it against the database.
-6. Display the results.
-
-*LLM integration and the complete execution flow must be verified in the running application.*
-
-### 2. AI-Powered SQL Generation
-
-Use an LLM to generate SQL from a natural-language question and relevant database schema information.
-
-The intended design supports schema-aware query generation, helping the model understand table names, columns, and relationships before producing SQL.
-
-Potential providers include a hosted LLM API or a locally running model through Ollama, depending on the implemented configuration.
-
-### 3. PostgreSQL Integration
-
-QueryMind uses PostgreSQL as its relational database.
-
-The development database includes tables such as:
-
-- `customers`
-- `orders`
-- `order_items`
-- `products`
-- `schema_knowledge`
-
-These tables support customer, order, product, and schema-related analytics.
-
-### 4. Interactive Analytics Dashboard
-
-The dashboard is built to organize analytics workflows in one place, including:
-
-- Query input and execution.
-- Analytics summary cards.
-- Data tables.
-- Chart visualizations.
-- Query history.
-- Saved queries.
-- Navigation and search.
-- Authentication interface.
-
-### 5. Data Visualization
-
-Recharts is used for dashboard visualizations.
-
-The intended experience is to convert suitable query results into charts so users can identify trends and compare values without manually analyzing raw database records.
-
-### 6. Query History and Saved Queries
-
-The application includes UI areas for query history and saved queries.
-
-Persistent storage, retrieval, and synchronization should be verified before considering these features fully complete.
-
-### 7. Responsive Interface
-
-The dashboard is being adapted for desktop, tablet, and mobile screens, including responsive navigation, charts, tables, and dialogs.
-
-### 8. Database Safety
-
-The intended database execution design uses a restricted read-only database role and query validation.
-
-Additional SQL validation and execution safeguards should be tested before exposing the application to untrusted input or production data.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js, React, TypeScript |
-| Styling | CSS and Tailwind CSS utilities where configured |
-| Charts | Recharts |
-| Backend | Node.js, Express.js, TypeScript |
-| Database | PostgreSQL |
-| Vector database support | pgvector |
-| SQL parsing | `node-sql-parser` |
-| Validation | Zod |
-| AI integration | LLM API or Ollama, depending on configuration |
-| Database connectivity | `pg` |
-| Containerization | Docker and Docker Compose |
-| Development tooling | npm, Git, Postman |
-
-The technologies above describe the project setup discussed so far. Check the current `package.json` files and source code for the exact installed versions and enabled integrations.
-
----
-
-## System Architecture
-
+Check frontend/package.json and backend/package.json for precise installed versions and scripts.
+Architecture
 ```mermaid
 flowchart TD
-    A[User] --> B[Next.js Dashboard]
-    B --> C[Backend API]
-    C --> D[Schema Context]
-    D --> E[LLM SQL Generation]
-    E --> F[SQL Validation]
-    F --> G[Read-Only PostgreSQL]
-    G --> H[Query Results]
-    H --> I[Tables and Recharts]
-    I --> B
-    C --> J[Query History and Saved Queries]
-    D --> K[Schema Knowledge]
+    U[User] --> F[Next.js Dashboard]
+    F --> A[Backend API]
+    A --> S[Schema and Knowledge Context]
+    S --> L[LLM SQL Generation]
+    L --> V[SQL Safety Validation]
+    V --> D[(PostgreSQL)]
+    D --> R[Structured Query Results]
+    R --> F
+    A --> H[Query History and Analytics Routes]
 ```
-
-### Architecture Components
-
-**Frontend**
-
-Provides the user interface for submitting natural-language questions, viewing results, inspecting visualizations, and managing analytics workflows.
-
-**Backend API**
-
-Coordinates incoming requests, schema retrieval, LLM interaction, SQL validation, database execution, and response formatting.
-
-**Schema Context**
-
-Provides relevant database tables, columns, and relationships to the SQL-generation process.
-
-**LLM Layer**
-
-Converts the user's question and schema context into a candidate SQL query.
-
-**SQL Validation Layer**
-
-Checks the generated query against the application's query policy before execution.
-
-**PostgreSQL**
-
-Executes approved queries using a restricted database account.
-
-**Visualization Layer**
-
-Presents returned data as tables and, where appropriate, charts.
-
----
-
-## How It Works
-
-The intended query lifecycle is:
-
-1. **Ask:** The user enters a natural-language analytics question.
-2. **Understand:** The backend identifies the relevant database schema.
-3. **Generate:** The LLM proposes a SQL query.
-4. **Validate:** The backend checks the SQL against the application's safety policy.
-5. **Execute:** The database executes the approved query using a restricted account.
-6. **Format:** The backend returns structured results.
-7. **Visualize:** The dashboard displays the results as tables, summary metrics, or charts.
-8. **Save:** Where implemented, the application records query history or saves the query for reuse.
-
-If a query is invalid, the application can eventually support a controlled correction workflow that regenerates or repairs the query and validates it again before execution.
-
----
-
-## Project Structure
-
-The following is an illustrative structure for the application. Adapt it to match the actual directories in your repository.
-
-```text
+The diagram describes the intended high-level workflow. Verify the active implementation and data flow in source code before treating every stage as production-complete.
+Main components
+- Frontend: Presents the dashboard and sends requests to the API.
+- Backend API: Coordinates authentication, schema lookup, SQL generation, validation, and database operations.
+- Schema and knowledge services: Provide table and schema context.
+- LLM layer: Proposes SQL from a user question and relevant schema context.
+- SQL safety layer: Evaluates generated SQL against the application's execution policy.
+- PostgreSQL: Stores relational data and schema knowledge.
+- Results UI: Displays query output using tables and supported charts.
+Query Lifecycle
+The intended flow for a natural-language query is:
+1. The user submits a question through the dashboard.
+2. The backend obtains relevant schema or knowledge context.
+3. The configured LLM proposes a SQL query.
+4. The backend validates the candidate SQL.
+5. An approved query executes against PostgreSQL with restricted permissions.
+6. The API returns structured results.
+7. The frontend displays the result in an appropriate table or visualization.
+8. Where implemented, query history or saved-query functionality makes the query available later.
+Never execute model-generated SQL without validation and database-level permission restrictions.
+Repository Structure
 QueryMind/
-├── client/                    # Frontend application, if using this directory
-│   ├── app/                   # Next.js App Router, if configured
+├── backend/
 │   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
-├── server/                    # Backend application, if using this directory
-│   ├── src/
+│   │   ├── config/
+│   │   ├── middleware/
 │   │   ├── routes/
-│   │   ├── services/
-│   │   ├── db/
-│   │   └── ...
+│   │   ├── scripts/
+│   │   └── services/
+│   ├── package.json
+│   └── tsconfig.json
+├── database/
+│   ├── init/
+│   ├── google-auth.sql
+│   └── ...
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   └── lib/
 │   ├── package.json
 │   └── ...
-├── docker-compose.yml         # Local database configuration
-├── .env.example               # Safe configuration template
 ├── .gitignore
+├── docker-compose.yml
 └── README.md
-```
-
-The actual frontend and backend directory names may differ. Preserve the structure already used by your repository rather than creating duplicate folders.
-
----
-
-## Prerequisites
-
-Install the following tools before running QueryMind:
-
-- [Node.js](https://nodejs.org/) — compatible with your installed Next.js version.
-- npm — included with Node.js.
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — for the local PostgreSQL container.
-- Git — for version control.
-- An LLM API key or a configured local model, if required by the current implementation.
-
-Optional tools:
-
-- [Postman](https://www.postman.com/) for API testing.
-- A PostgreSQL client such as `psql` for database inspection.
-- An editor such as Visual Studio Code.
-
-Verify your installations:
-
-```bash
+This tree is a high-level guide; exact files may evolve as the project develops.
+Prerequisites
+Install the following:
+- Node.js compatible with the installed Next.js version
+- npm
+- Docker Desktop and Docker Compose, if using the local containerized database
+- Git
+- A configured LLM provider and API key if required by the current environment
+Verify installations:
 node --version
 npm --version
+git --version
 docker --version
 docker compose version
-```
-
----
-
-## Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/QueryMind.git
+If PowerShell reports that docker is not recognized, open Docker Desktop and verify the Docker CLI installation and PATH.
+Local Setup
+1. Clone the repository
+git clone https://github.com/Gautam0804/QueryMind.git
 cd QueryMind
-```
-
-Replace `YOUR_USERNAME/QueryMind` with the actual repository URL.
-
-### 2. Configure Environment Variables
-
-Create the environment files required by the frontend, backend, and Docker configuration.
-
-Use `.env.example` as the template if the repository includes one.
-
-Never commit API keys, passwords, access tokens, or other secrets.
-
-### 3. Start PostgreSQL with Docker
-
-From the directory containing `docker-compose.yml`, run:
-
-```bash
+2. Configure environment files
+Review the environment variables required by the backend, frontend, and docker-compose.yml. Create local .env files as required by the actual code. Do not commit real credentials.
+3. Start the database
+From the repository root:
 docker compose up -d
-```
-
-Check the running containers:
-
-```bash
 docker compose ps
-```
-
-View database logs if needed:
-
-```bash
-docker compose logs postgres
-```
-
-The development setup previously used the `pgvector/pgvector:pg16` image and a PostgreSQL host port of `15433`, mapped to container port `5432`.
-
-Confirm the current port mapping in your Docker Compose file before connecting.
-
-### 4. Install Frontend Dependencies
-
-Navigate to the actual frontend directory:
-
-```bash
-cd client
+Review logs if the database does not start:
+docker compose logs
+The local setup previously used the pgvector/pgvector:pg16 image and a PostgreSQL host port of 15433 mapped to container port 5432. Confirm the current docker-compose.yml before relying on those values.
+4. Install backend dependencies
+cd backend
 npm install
-```
-
-If the frontend directory is different, use its actual path.
-
-### 5. Install Backend Dependencies
-
-In a separate terminal, navigate to the backend directory:
-
-```bash
-cd server
+5. Configure backend environment variables
+Set the database connection and LLM provider settings required by the backend source. See Environment Variables.
+6. Start the backend
+Run from backend/:
+npm run dev
+The development API has previously been configured to use http://localhost:4000. Confirm the actual port from the backend configuration and startup logs.
+7. Install frontend dependencies
+Open a second terminal from the repository root:
+cd frontend
 npm install
-```
-
-Use the directory and scripts defined by the current backend project.
-
-### 6. Start the Backend
-
-If the backend package defines a `dev` script:
-
-```bash
+8. Configure the frontend API URL
+Set the frontend API base URL according to the variable name actually used by frontend/src/lib/api.ts. For local development, the API has previously been available at http://localhost:4000.
+9. Start the frontend
+Run from frontend/:
 npm run dev
-```
-
-The development backend has previously been configured to run at:
-
-```text
-http://localhost:4000
-```
-
-### 7. Start the Frontend
-
-From the frontend directory, run:
-
-```bash
-npm run dev
-```
-
-The Next.js development server has previously been configured to run at:
-
-```text
-http://localhost:3000
-```
-
-Open that URL in your browser to access the dashboard.
-
----
-
-## Environment Variables
-
-The exact variable names must match the existing application code and Docker Compose configuration.
-
-An example template might look like this:
-
-```dotenv
-# Backend
+The Next.js development server has previously been configured to use http://localhost:3000. Open that address in your browser and check the startup output if it differs.
+Environment Variables
+The exact variable names and required values must be taken from the current source code and Docker configuration. The following are examples of common settings, not a guarantee that every name is used by this repository.
+# Backend server
 PORT=4000
 NODE_ENV=development
 
-# PostgreSQL
+# PostgreSQL — replace placeholders with local values
 DATABASE_URL=postgresql://DB_USER:DB_PASSWORD@localhost:15433/DB_NAME
 
-# LLM provider — configure only if required
-LLM_API_KEY=YOUR_API_KEY
-LLM_MODEL=YOUR_CONFIGURED_MODEL
+# LLM provider — use only variables required by the configured provider
+GEMINI_API_KEY=YOUR_API_KEY
 
-# Frontend
+# Frontend — use the exact variable name read by frontend/src/lib/api.ts
 NEXT_PUBLIC_API_URL=http://localhost:4000
-```
+Before starting the app:
+1. Inspect backend/src/config/db.ts for database configuration.
+2. Inspect backend/src/config/gemini.ts for LLM provider settings.
+3. Inspect frontend/src/lib/api.ts for the frontend API base URL.
+4. Inspect docker-compose.yml for database environment variables and port mappings.
+5. Confirm that local environment files are ignored by Git.
+Never commit real API keys, passwords, tokens, or production connection strings. Variables prefixed with NEXT_PUBLIC_ are exposed to the browser and must never contain secrets.
+Database
+Development schema
+The repository includes SQL initialization scripts under database/init/. The development database has included tables such as:
+- customers
+- orders
+- order_items
+- products
+- schema_knowledge
+Verify current table names, columns, relationships, and constraints from the SQL scripts and running database before using them in queries.
+Inspect tables
+If the Compose service is named postgres and the database credentials match your local configuration, list tables with:
+docker compose exec postgres psql -U querymind_admin -d querymind -c "\dt"
+The service name, username, and database name may differ in your current configuration.
+Read-only access
+Use a dedicated database role with only the permissions needed for analytics. Do not use an administrator account to execute LLM-generated SQL. Ensure that database-level permissions complement the application's SQL-validation policy.
+Vector support
+The project setup has used a pgvector-enabled PostgreSQL image. Confirm that the extension is enabled and that the application actually uses vector functionality in the current implementation before relying on semantic retrieval in production.
+Running the Application
+Start the database, backend, and frontend in separate terminals as described above.
+Suggested manual smoke tests
+1. Open the dashboard.
+2. Sign in using the configured authentication flow.
+3. Submit a simple, read-only analytics question.
+4. Confirm that SQL generation and validation complete successfully.
+5. Confirm that the database query returns expected results.
+6. Verify that result tables and charts handle returned data.
+7. Test invalid or unsafe SQL and confirm it is rejected.
+8. Check query history and saved queries if enabled.
+9. Verify that API failures are displayed safely and do not leak secrets.
+Example prompts to try, subject to the actual schema:
+- "Count the customers."
+- "Show five products."
+- "Count orders by status."
+- "Summarize orders by month."
+Available Scripts
+Frontend
+Run commands from frontend/:
+Command	Purpose
+npm run dev	Start the Next.js development server
+npm run build	Create a production build
+npm run start	Run the built Next.js app
+npm run lint	Run ESLint
 
-These names are illustrative, not a guarantee that the current source code reads every variable.
 
-Before running the application:
+Backend
+Run commands from backend/:
+Command	Purpose
+npm run dev	Run the backend in development mode using the configured watcher
+npm run build	Compile TypeScript to the configured output directory
+npm run start	Run the compiled server
+npm run typecheck	Type-check without emitting output
+npm test	Run the configured test script
 
-1. Inspect the backend database configuration.
-2. Inspect the LLM provider configuration.
-3. Check the frontend API client.
-4. Check the Docker Compose environment section.
-5. Replace placeholders with your local configuration.
 
-**Important:** Do not place private API keys or database passwords in variables prefixed with `NEXT_PUBLIC_`. Next.js exposes those variables to browser-side code.
+The backend package has previously shown a placeholder test script that exits with an error. Verify the current backend/package.json and replace the placeholder with a real test command before relying on npm test in CI.
+API
+The backend includes route modules for authentication, queries, analytics, and query history. Exact endpoint paths, methods, payload schemas, and response formats should be taken from the current route definitions under backend/src/routes/.
 
-Keep `.env` files out of version control.
-
----
-
-## Database Setup
-
-### Database Overview
-
-The local development database contains these tables:
-
-| Table | Intended purpose |
-|---|---|
-| `customers` | Customer records |
-| `orders` | Order information |
-| `order_items` | Products and quantities associated with orders |
-| `products` | Product information |
-| `schema_knowledge` | Schema-related knowledge for analytics and query generation |
-
-Verify the actual columns, constraints, and relationships in PostgreSQL before relying on a particular query.
-
-### Inspect Database Tables
-
-If the Docker Compose service is named `postgres`, inspect the available tables with:
-
-```bash
-docker compose exec postgres psql \
-  -U querymind_admin \
-  -d querymind \
-  -c "\dt"
-```
-
-This command assumes the service, username, and database match your local configuration.
-
-### Inspect a Table
-
-For example:
-
-```sql
-SELECT *
-FROM products
-LIMIT 5;
-```
-
-### Read-Only Database Access
-
-The development setup has included a restricted database role named `querymind_reader`.
-
-The intended principle is to separate the account used by the application for analytics from the administrative database account.
-
-Verify that the reader role has only the permissions required for the application's approved queries.
-
-Do not expose administrative credentials to the frontend.
-
----
-
-## Running the Application
-
-Once the database and both applications are configured:
-
-1. Start Docker Desktop.
-2. Start the PostgreSQL container.
-3. Start the backend API.
-4. Start the Next.js frontend.
-5. Open `http://localhost:3000`.
-6. Submit a test analytics question.
-7. Verify the generated SQL, query execution, and returned results where those interfaces are available.
-
-### Example Questions to Test
-
-- Show five products from the products table.
-- Count the total number of customers.
-- Show the number of orders by status.
-- Display the most frequently ordered products.
-- Summarize order totals by month.
-
-These are example test prompts. Their successful execution depends on the actual database schema and the current LLM integration.
-
----
-
-## API Documentation
-
-The backend has previously been configured to run on port `4000`.
-
-A health-check request has been used during development:
-
-```http
+A health endpoint has previously been tested at:
 GET http://localhost:4000/api/health
-```
-
-You can test it using a browser, Postman, or the following command:
-
-```bash
-curl http://localhost:4000/api/health
-```
-
-The exact response format should be confirmed from the current route implementation.
-
-### Core API Responsibilities
-
-The intended API design may include the following responsibilities:
-
-| Responsibility | Description |
-|---|---|
-| Health check | Verify that the API is running |
-| Query execution | Accept an analytics question and return validated query results |
-| Schema retrieval | Provide database schema context |
-| Query history | Retrieve previous queries |
-| Saved queries | Store and retrieve reusable queries |
-
-These are functional categories, not a claim that all corresponding routes already exist.
-
-Before publishing detailed API documentation, add the actual endpoint paths, HTTP methods, request bodies, response examples, and authentication requirements from the backend source code.
-
----
-
-## Security
-
-Database access through an LLM requires careful safeguards. A generated query must never be trusted merely because it was produced by an AI model.
-
-QueryMind's intended security approach includes the following principles.
-
-### 1. Read-Only Database Role
-
-Use a dedicated database account with only the necessary read permissions.
-
-Do not run AI-generated queries through an administrator or database-owner account.
-
-### 2. SQL Validation
-
-Validate generated SQL before execution.
-
-A robust implementation should:
-
-- Allow only the supported query types.
-- Reject data modification and schema modification statements.
-- Reject multiple statements if they are not explicitly supported.
+Confirm the route exists and verify its response against backend/src/server.ts before relying on it.
+API documentation checklist
+Before publishing detailed API reference documentation, document for each implemented endpoint:
+- HTTP method and path
+- Authentication requirements
+- Request body and validation rules
+- Successful response format
+- Error response format
+- Rate limits and relevant execution constraints
+Do not assume that every suggested API capability has a corresponding implemented endpoint.
+Security Considerations
+LLM-generated SQL is untrusted input. Do not expose the application to sensitive production data until the security controls have been reviewed and tested in the deployment environment.
+SQL validation
+- Allow only supported query types.
+- Reject data-modification and schema-modification statements unless explicitly required and safely designed.
+- Reject multiple statements if they are not supported.
 - Validate referenced tables and columns.
-- Restrict access to sensitive tables and fields.
-- Use parameterized queries for user-provided values.
-- Apply query execution timeouts and result-size limits.
-
-A simple string check is not a complete SQL security boundary. Use a parser and enforce the policy on the parsed query structure.
-
-### 3. Database-Level Restrictions
-
-Application-level validation should be backed by database permissions.
-
-Where appropriate, configure statement timeouts, connection limits, and restricted access to schemas.
-
-### 4. Secrets Management
-
-Store database credentials and API keys in environment variables or an appropriate secrets manager.
-
-Never include secrets in:
-
-- Frontend source code.
-- Public repositories.
-- Screenshots.
-- Logs or error messages.
-- Client-visible API responses.
-
-### 5. LLM Output Is Untrusted
-
-Treat model-generated SQL as untrusted input. Validate it before every execution, even when the model appears to have followed instructions.
-
-### 6. Production Deployment
-
-Before exposing QueryMind publicly, add and verify authentication, authorization, rate limiting, safe error handling, request validation, and monitoring.
-
-These recommendations describe the intended security standard; they do not imply that every safeguard has already been implemented or audited.
-
----
-
-## Example Use Cases
-
-### Business Analytics
-
-Ask natural-language questions about customers, products, and orders.
-
-### Sales Reporting
-
-Generate summaries of order activity and product performance.
-
-### Data Exploration
-
-Explore structured datasets without manually writing every SQL query.
-
-### Interactive Reporting
-
-Display suitable query results in tables and visualizations.
-
-### Developer Productivity
-
-Reduce the time spent writing repetitive analytical SQL queries.
-
----
-
-## Troubleshooting
-
-### Docker Command Not Found
-
-Verify that Docker Desktop is installed and running.
-
-```bash
-docker --version
-docker compose version
-```
-
-If the commands are unavailable, check the Docker installation and system `PATH`, then reopen the terminal.
-
-### Missing PostgreSQL Password
-
-If Docker Compose reports that a required PostgreSQL password is missing, verify that the correct environment file exists and that the variable referenced by `docker-compose.yml` is defined.
-
-Do not commit the password to Git.
-
-### Cannot Connect to PostgreSQL
-
-Check the container status:
-
-```bash
+- Use parameterized queries for user-supplied values.
+- Apply execution timeouts and result-size limits.
+- Revalidate every corrected or regenerated SQL query.
+A basic string check is not a sufficient security boundary. Use parser-based validation and enforce policy on the parsed query structure.
+Database permissions
+- Use a dedicated read-only database account for analytics.
+- Avoid using database-owner or administrative credentials for generated queries.
+- Keep the database private and restrict network access.
+- Configure least-privilege permissions and appropriate connection limits.
+Authentication and secrets
+- Keep secrets on the backend.
+- Validate authorization on every protected endpoint.
+- Configure secure production cookies/tokens as appropriate to the implemented authentication design.
+- Restrict CORS to intended origins.
+- Avoid logging passwords, API keys, tokens, or sensitive query data.
+- Rotate any credential that may have been exposed.
+Production configuration
+Before deployment, verify HTTPS, environment variables, database networking, logging, error handling, request limits, and provider quotas. Passing local tests does not by itself establish production security.
+Troubleshooting
+docker is not recognized
+Start Docker Desktop and verify that the Docker CLI is installed and on PATH. Open a new terminal after changing environment variables.
+PostgreSQL connection errors
+Check container status and logs:
 docker compose ps
-```
+docker compose logs
+Verify the host port, database name, username, password, and connection string. A host port such as 15433 can map to container port 5432.
+Missing environment variables
+Compare the local environment file with the variables actually read by backend configuration files and docker-compose.yml. Do not solve missing-variable errors by committing secrets.
+Frontend cannot reach the backend
+Inspect frontend/src/lib/api.ts, confirm the configured API URL, ensure the backend is running, and verify the backend's CORS configuration. For production, use the deployed HTTPS API URL rather than a localhost address.
+Backend start fails
+Ensure the TypeScript build completes and the configured output file exists. The current start script has previously expected dist/server.js, so confirm that tsconfig.json emits the server to that path.
+Invalid or expired token
+Review token creation, expiration, authorization headers, and server-side validation. Handle expired sessions gracefully and never expose token contents in logs.
+LLM produces invalid SQL
+Verify that relevant schema context is supplied to the model. Reject invalid or unsafe SQL before execution. If an automatic correction loop exists, limit retries and revalidate each result.
+Charts are empty or incorrect
+Check the API response shape and the fields consumed by the chart components. Verify handling of empty data, numeric values, and unexpected query results.
+Roadmap
+The checkboxes below reflect project milestones and planned work. Mark an item complete only after implementation and verification.
 
-Review logs:
-
-```bash
-docker compose logs postgres
-```
-
-Confirm the host port, username, password, database name, and connection URL.
-
-Remember that a host port such as `15433` may map to the container's standard PostgreSQL port `5432`.
-
-### Backend Does Not Start
-
-Check the backend's installed dependencies and available scripts:
-
-```bash
-npm install
-npm run
-```
-
-Run the development script defined in `package.json` and inspect the first reported error.
-
-### TypeScript Compilation Errors
-
-Verify that the installed TypeScript version and `tsconfig.json` options are compatible.
-
-Use module and module-resolution settings supported by the installed TypeScript version.
-
-### Invalid or Expired Token
-
-If an API request fails because of an invalid or expired token:
-
-1. Check the authentication flow.
-2. Confirm that the frontend sends the expected authorization header.
-3. Verify token expiration and server-side validation.
-4. Sign in again if the token has expired.
-5. Ensure that API errors are handled without exposing sensitive details.
-
-### LLM Generates Invalid SQL
-
-Check that the model receives the relevant schema and relationships.
-
-Validate the SQL before execution. If automatic correction is implemented, limit the number of retries and revalidate every corrected query.
-
-### Dashboard Charts Do Not Display
-
-Verify that the API returns structured data, that the chart receives the expected keys, and that numeric values are formatted correctly.
-
-Check the browser console and backend logs for errors.
-
----
-
-## Roadmap
-
-The following roadmap represents planned or verification-needed work, not a claim that each item is already complete.
-
-- [x] Establish the PostgreSQL Docker development environment.
-- [x] Create the initial database tables.
-- [x] Set up the backend development server.
-- [x] Build the initial dashboard interface.
-- [x] Add dashboard query, history, and saved-query UI areas.
-- [ ] Verify the complete natural-language-to-SQL workflow.
-- [ ] Complete and test schema-aware SQL generation.
-- [ ] Enforce SQL validation and execution safeguards.
-- [ ] Implement or verify automatic SQL correction.
-- [ ] Connect query results to dynamic charts and tables.
-- [ ] Verify persistent query history and saved queries.
-- [ ] Test authentication and authorization end to end.
-- [ ] Complete mobile and tablet responsiveness testing.
-- [ ] Add comprehensive automated tests.
-- [ ] Deploy the application to a production environment.
-- [ ] Add monitoring, documentation, and production security checks.
-
----
-
-## Contributing
-
+Phase 1: Project Foundation
+- [x] Establish the frontend, backend, and database project structure.
+- [x] Set up PostgreSQL development infrastructure with Docker Compose.
+- [x] Configure the initial database schema and analytics tables.
+- [x] Set up the Next.js frontend and TypeScript backend.
+- [x] Configure environment variables and Git repository management.
+Phase 2: Backend and Database
+- [x] Implement backend API infrastructure using Node.js, Express.js, and TypeScript.
+- [x] Add database connectivity with PostgreSQL.
+- [x] Implement initial authentication and query-related routes.
+- [x] Add schema-context and SQL-generation service modules.
+- [x] Add SQL parsing, validation, and safety components.
+- [x] Configure database access with read-only permissions for analytics.
+Phase 3: Frontend and Analytics Dashboard
+- [x] Build the initial analytics dashboard using Next.js and React.
+- [x] Create the natural-language query interface.
+- [x] Add query results and data visualization components.
+- [x] Integrate the frontend with the backend API.
+- [x] Add initial navigation, authentication, and query-history UI areas.
+- [x] Integrate charting components using Recharts.
+Phase 4: Core Integration and Validation
+- [x] Integrate the initial frontend, backend, and database workflow.
+- [x] Configure LLM integration for SQL generation.
+- [x] Add schema-aware context for query generation.
+- [x] Implement initial SQL safety validation.
+- [x] Run the reported TypeScript compilation and frontend build checks.
+- [x] Review the setup documentation and repository structure.
+Phase 5: Production Readiness
+- [ ] Finalize and verify production deployment configuration.
+- [ ] Verify production environment variables and database networking.
+- [ ] Configure production frontend and backend hosting.
+- [ ] Complete production build and startup verification.
+- [ ] Replace placeholder backend test scripts with automated test suites.
+- [ ] Add automated tests for SQL generation, validation, and execution.
+- [ ] Configure CI checks for linting, type-checking, builds, and tests.
+- [ ] Deploy the application and verify the live end-to-end workflow.
+- [ ] Complete a production security review.
+- [ ] Configure production logging, monitoring, and operational alerts.
+- [ ] Add appropriate rate limiting, request limits, and error handling.
+- [ ] Verify authentication, authorization, and secret management in production.
+Phase 6: Future Enhancements
+- [ ] Improve schema retrieval and semantic search using pgvector.
+- [ ] Add robust SQL correction and retry workflows with safety revalidation.
+- [ ] Improve query history, saved queries, and query management.
+- [ ] Expand chart types and dashboard customization.
+- [ ] Add export options for query results.
+- [ ] Improve empty states, loading states, and error messages.
+- [ ] Optimize query performance and database resource usage.
+- [ ] Add user-facing documentation and API reference documentation.
+Current status: Core development foundations are in place. Production deployment and future enhancements should be marked complete only after implementation and verification.
+Contributing
 Contributions and suggestions are welcome.
-
-To work on the project locally:
-
 1. Fork the repository.
 2. Create a feature branch.
 3. Make your changes.
-4. Run the available tests and checks.
-5. Submit a pull request describing your changes.
-
+4. Run the available lint, type-check, build, and test commands.
+5. Open a pull request describing the change and the checks performed.
 Example:
-
-```bash
 git checkout -b feature/your-feature
-```
+Do not commit secrets, local .env files, dependencies, or generated build output.
+License
+No license has been confirmed for this repository. Add a LICENSE file and update this section when the project owner has selected a license. Until then, the licensing terms should be considered unspecified.
+Author
+QueryMind — AI-powered Text-to-SQL analytics assistant
 
-Follow the existing code style and avoid committing credentials, generated files, or local environment configuration.
+GitHub: https://github.com/Gautam0804/QueryMind
 
----
-
-## License
-
-No license has been specified here.
-
-Before distributing the project, add a `LICENSE` file and update this section with the license you choose. If the project is private or the licensing decision has not been made, leave the licensing terms clearly marked as pending.
-
----
-
-## Author
-
-**QueryMind**
-
-AI-powered Text-to-SQL analytics assistant.
-
-Repository: `https://github.com/Gautam0804/QueryMind`
-
-
----
-
-*QueryMind is a development project intended to explore natural-language database querying, LLM-assisted SQL generation, and interactive analytics. Do not use it with sensitive production data until its security controls and execution behavior have been independently verified.*
+QueryMind is a development project exploring natural-language database querying, LLM-assisted SQL generation, and interactive analytics. Verify the implementation and security controls in the target environment before using it with sensitive or production data.

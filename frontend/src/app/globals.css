@@ -1,0 +1,782 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   QUERYMIND — FINAL CSS 3D LOGIN
+   No PNG • No Three.js
+============================================ */
+
+.qm-login {
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #080d0a;
+  color: #eef7f0;
+}
+
+.qm-login-scene {
+  position: relative;
+  min-height: 390px;
+  perspective: 1100px;
+  isolation: isolate;
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(16, 185, 129, 0.13), transparent 65%),
+    #080f0b;
+  box-shadow:
+    inset 0 0 60px rgba(16, 185, 129, 0.035),
+    0 20px 55px rgba(0, 0, 0, 0.18);
+}
+
+.qm-login-grid {
+  background-image:
+    linear-gradient(rgba(52, 211, 153, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(52, 211, 153, 0.09) 1px, transparent 1px);
+  background-size: 25px 25px;
+  transform: perspective(500px) rotateX(62deg) scale(1.8);
+  transform-origin: center 80%;
+  opacity: 0.7;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 35%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.qm-login-stage {
+  position: relative;
+  width: 320px;
+  height: 290px;
+  transform-style: preserve-3d;
+  transition: transform 180ms ease-out;
+  will-change: transform;
+}
+
+.qm-login-database {
+  position: absolute;
+  inset: 35px 55px 65px;
+  transform-style: preserve-3d;
+  transform: rotateX(-12deg) rotateY(-22deg) scale(1.12);
+  filter: drop-shadow(0 8px 20px rgba(16, 185, 129, 0.15));
+}
+
+.qm-login-db-layer {
+  position: absolute;
+  left: 0;
+  width: 210px;
+  height: 72px;
+  transform-style: preserve-3d;
+}
+
+.qm-login-db-layer-1 { top: 0; }
+.qm-login-db-layer-2 { top: 53px; }
+.qm-login-db-layer-3 { top: 106px; }
+
+.qm-login-db-top {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  height: 45px;
+  border: 2px solid #6ee7b7;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    #267b50 0%,
+    #105c38 35%,
+    #052e20 75%,
+    #10b981 100%
+  );
+  box-shadow:
+    0 0 18px rgba(16, 185, 129, 0.55),
+    0 0 36px rgba(16, 185, 129, 0.18),
+    inset 0 0 18px rgba(52, 211, 153, 0.27);
+}
+
+.qm-login-db-body {
+  position: absolute;
+  top: 22px;
+  width: 210px;
+  height: 45px;
+  border-right: 2px solid #34d399;
+  border-left: 2px solid #34d399;
+  background: linear-gradient(
+    90deg,
+    #071b12 0%,
+    #14532d 45%,
+    #0b301d 75%,
+    #071b12 100%
+  );
+  box-shadow:
+    inset 0 0 22px rgba(16, 185, 129, 0.2),
+    0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+.qm-login-db-bottom {
+  position: absolute;
+  top: 44px;
+  width: 210px;
+  height: 45px;
+  border: 2px solid #10b981;
+  border-radius: 50%;
+  box-shadow:
+    0 0 18px rgba(16, 185, 129, 0.4),
+    inset 0 -8px 15px rgba(16, 185, 129, 0.17);
+}
+
+.qm-login-db-lights {
+  position: absolute;
+  top: 19px;
+  right: 14px;
+  display: flex;
+  gap: 7px;
+}
+
+.qm-login-db-lights span {
+  width: 4px;
+  height: 4px;
+  flex: 0 0 4px;
+  border-radius: 50%;
+  background: #a7f3d0;
+  box-shadow: 0 0 8px #34d399;
+  animation: qm-login-blink 1.8s ease-in-out infinite alternate;
+}
+
+.qm-login-db-lights span:nth-child(2) { animation-delay: 0.3s; }
+.qm-login-db-lights span:nth-child(3) { animation-delay: 0.6s; }
+.qm-login-db-lights span:nth-child(4) { animation-delay: 0.9s; }
+
+/* Holographic rings */
+
+.qm-login-ring {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 275px;
+  height: 85px;
+  border: 1px solid rgba(52, 211, 153, 0.53);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotateX(65deg);
+  box-shadow:
+    0 0 20px rgba(16, 185, 129, 0.13),
+    inset 0 0 12px rgba(16, 185, 129, 0.08);
+  pointer-events: none;
+}
+
+.qm-login-ring-two {
+  width: 310px;
+  height: 110px;
+  border-color: rgba(16, 185, 129, 0.28);
+  animation: qm-login-ring-pulse 3s ease-in-out infinite;
+}
+
+/* Floating data cards */
+
+.qm-login-float-card {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(52, 211, 153, 0.27);
+  border-radius: 10px;
+  background: rgba(8, 25, 16, 0.92);
+  color: #a7f3d0;
+  font-size: 10px;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    0 0 20px rgba(16, 185, 129, 0.07);
+}
+
+.qm-login-card-left {
+  top: 36px;
+  left: -8px;
+  animation: qm-login-card-float 4s ease-in-out infinite;
+}
+
+.qm-login-card-right {
+  top: 95px;
+  right: -8px;
+  animation: qm-login-card-float 4s ease-in-out infinite reverse;
+}
+
+.qm-login-float-card i {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 8px #34d399;
+}
+
+/* Floating cubes */
+
+.qm-login-cube {
+  position: absolute;
+  z-index: 4;
+  width: 17px;
+  height: 17px;
+  border: 1px solid #6ee7b7;
+  background: rgba(52, 211, 153, 0.12);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  transform: rotate(35deg) skew(-8deg, -8deg);
+  animation: qm-login-cube-float 4s ease-in-out infinite;
+}
+
+.qm-login-cube-one {
+  top: 90px;
+  left: 32px;
+}
+
+.qm-login-cube-two {
+  top: 150px;
+  right: 28px;
+  animation-delay: -1.3s;
+}
+
+.qm-login-cube-three {
+  bottom: 65px;
+  left: 55px;
+  animation-delay: -2s;
+}
+
+/* Database base */
+
+.qm-login-base {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 235px;
+  padding: 15px;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #153c29, #08140d);
+  color: #a7f3d0;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(16, 185, 129, 0.13);
+  transform: translateX(-50%) rotateX(8deg);
+}
+
+.qm-login-live-dot {
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 10px #34d399;
+}
+
+/* Animations */
+
+@keyframes qm-login-card-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@keyframes qm-login-cube-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 5px -12px; }
+}
+
+@keyframes qm-login-ring-pulse {
+  0%, 100% { opacity: 0.4; scale: 0.95; }
+  50% { opacity: 1; scale: 1.05; }
+}
+
+@keyframes qm-login-blink {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+/* One-screen desktop login polish */
+
+@media (min-width: 1024px) {
+  .qm-login {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .qm-login-scene {
+    min-height: 250px;
+    max-height: 34vh;
+    margin-top: 20px;
+  }
+
+  .qm-login-stage {
+    scale: 0.82;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 800px) {
+  .qm-login-scene {
+    min-height: 210px;
+    max-height: 29vh;
+    margin-top: 14px;
+  }
+
+  .qm-login-stage {
+    scale: 0.7;
+  }
+
+  .qm-login-float-card {
+    padding: 8px 10px;
+  }
+}
+
+/* Responsive layout */
+
+@media (max-width: 1023px) {
+  .qm-login {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .qm-login-scene {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .qm-login-scene {
+    min-height: 330px;
+  }
+
+  .qm-login-stage {
+    scale: 0.85;
+  }
+
+  .qm-login-card-left { left: -5px; }
+  .qm-login-card-right { right: -5px; }
+}
+
+@media (max-width: 360px) {
+  .qm-login-stage {
+    scale: 0.76;
+  }
+
+  .qm-login-float-card {
+    padding: 8px;
+    font-size: 9px;
+  }
+}
+
+/* Reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .qm-login-stage {
+    transition: none;
+  }
+
+  .qm-login-ring-two,
+  .qm-login-float-card,
+  .qm-login-cube,
+  .qm-login-db-lights span {
+    animation: none !important;
+  }
+}
+
+
+/* ============================================
+   QUERYMIND — TYPOGRAPHY SYSTEM
+   Inter for UI • Geist Mono for technical text
+============================================ */
+
+:root {
+  --qm-font-ui: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  --qm-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --qm-text-xs: 0.75rem;
+  --qm-text-sm: 0.875rem;
+  --qm-text-base: 1rem;
+}
+
+html {
+  font-family: var(--qm-font-ui);
+  text-rendering: optimizeLegibility;
+}
+
+body, button, input, textarea, select {
+  font-family: var(--qm-font-ui);
+}
+
+button, input, textarea, select {
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--qm-font-ui);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+p, li, label {
+  text-wrap: pretty;
+}
+
+code, pre, kbd, samp, .font-mono, [data-font="mono"] {
+  font-family: var(--qm-font-mono);
+  font-feature-settings: "tnum" 1, "ss02" 1;
+}
+
+/* Keep data aligned when displaying numeric values in tables and metrics. */
+[data-numeric="true"], .tabular-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Keep technical text legible without changing the existing color theme. */
+pre, code {
+  font-size: 0.92em;
+  line-height: 1.65;
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.28);
+  color: #f0fdf4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================
+   QUERYMIND — MOBILE RESPONSIVE SYSTEM
+   Preserves existing dark-green theme
+========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-width: 320px;
+  overflow-x: clip;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  margin: 0;
+  overflow-x: clip;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+/* Prevent dashboard content from forcing page width */
+main,
+section,
+article,
+aside,
+header,
+footer {
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  /* Main dashboard layout */
+  .qm-dashboard,
+  .qm-dashboard-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Dashboard grids */
+  .qm-stats-grid,
+  .qm-dashboard-grid,
+  .qm-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Charts */
+  .recharts-responsive-container {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+
+  /* Results tables */
+  .qm-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .qm-table-wrapper table {
+    min-width: 560px;
+    white-space: nowrap;
+  }
+
+  /* Keep search controls from expanding header */
+  .qm-search {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Comfortable touch targets */
+  .qm-dashboard button,
+  .qm-dashboard a {
+    min-height: 36px;
+  }
+}
+
+/* Phones */
+@media (max-width: 767px) {
+  /* Sidebar remains a slide-in drawer */
+  .qm-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: min(85vw, 300px);
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Header */
+  .qm-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    min-height: 64px;
+    height: auto;
+    padding: 10px 14px;
+    gap: 8px;
+    background: rgba(12, 14, 12, 0.94);
+    backdrop-filter: blur(14px);
+  }
+
+  .qm-header-title {
+    font-size: 13px;
+  }
+
+  /* Single-column content */
+  .qm-stats-grid,
+  .qm-dashboard-grid,
+  .qm-chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Use these classes on page content containers */
+  .qm-dashboard-content {
+    padding: 16px;
+  }
+
+  .qm-dashboard-card {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  /* Text and headings */
+  .qm-page-title {
+    font-size: clamp(22px, 6vw, 30px);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .qm-section-title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* Query composer */
+  .qm-query-input {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .qm-query-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .qm-query-actions button {
+    flex: 1 1 auto;
+  }
+
+  /* Tables: scroll within the card */
+  .qm-table-wrapper {
+    margin-inline: -4px;
+    width: calc(100% + 8px);
+  }
+
+  .qm-table-wrapper table {
+    min-width: 520px;
+    font-size: 12px;
+  }
+
+  /* Login page: allow scrolling on small screens */
+  .qm-login-page {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+  }
+
+  .qm-login-layout {
+    height: auto !important;
+    min-height: 100dvh !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    overflow: visible !important;
+  }
+
+  .qm-login-layout > section {
+    min-width: 0;
+    padding: 28px 20px !important;
+  }
+
+  .qm-login-layout > section:first-child > div:nth-child(2) {
+    margin-top: 28px !important;
+  }
+
+  .qm-login-layout .qm-login-scene {
+    min-height: 270px;
+    max-height: none;
+  }
+
+  .qm-login-layout .qm-login-stage {
+    scale: 0.78;
+  }
+
+  .qm-login-layout > section:last-child > div {
+    max-height: none;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .qm-dashboard-content {
+    padding: 12px;
+  }
+
+  .qm-dashboard-card {
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  .qm-stats-grid {
+    gap: 10px;
+  }
+
+  .qm-page-title {
+    font-size: 23px;
+  }
+
+  .qm-login-layout > section {
+    padding-inline: 16px !important;
+  }
+
+  .qm-login-layout .qm-login-stage {
+    scale: 0.68;
+  }
+
+  .qm-login-layout .qm-login-scene {
+    min-height: 240px;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 360px) {
+  .qm-dashboard-content {
+    padding: 10px;
+  }
+
+  .qm-dashboard-card {
+    padding: 11px;
+  }
+
+  .qm-login-layout .qm-login-stage {
+    scale: 0.6;
+  }
+
+  .qm-login-layout .qm-login-scene {
+    min-height: 220px;
+  }
+}
+
+/* Tablet layout */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .qm-dashboard-content {
+    padding: 22px;
+  }
+
+  .qm-dashboard-card {
+    padding: 18px;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

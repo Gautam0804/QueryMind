@@ -748,9 +748,8 @@ Before distributing the project, add a `LICENSE` file and update this section wi
 
 AI-powered Text-to-SQL analytics assistant.
 
-Repository: `https://github.com/YOUR_USERNAME/QueryMind`
+Repository: `https://github.com/Gautam0804/QueryMind`
 
-Replace the repository URL and add your preferred author or contact details before publishing.
 
 ---
 

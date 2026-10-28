@@ -1,6 +1,5 @@
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = "";
 
 export interface SchemaResponse {
   tables: string[];
@@ -121,7 +120,7 @@ export function logout() {
 }
 
 export function startGoogleLogin() {
-  window.location.assign(`${API_URL}/api/auth/google`);
+  window.location.assign("/api/auth/google");
 }
 
 // Database and schema

@@ -28,10 +28,12 @@ const sessionCookie = 'querymind_session';
 const stateCookie = 'querymind_oauth_state';
 const sessionMaxAge = 7 * 24 * 60 * 60 * 1000;
 
+// Production frontend and backend use different domains.
+// SameSite=None allows cross-site requests; Secure requires HTTPS.
 const sessionCookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'lax' as const,
+  sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
   path: '/',
 };
 

@@ -1,5 +1,6 @@
 <div align="center">
 
+
 # 🧠 QueryMind
 
 ### Ask your database questions in plain English. Get safe SQL, results, and charts.

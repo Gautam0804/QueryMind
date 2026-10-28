@@ -1,283 +1,304 @@
 <div align="center">
 
-QueryMind
-Ask questions. Get insights. Skip the manual SQL.
-QueryMind is an AI-powered Text-to-SQL analytics assistant designed to make relational data easier to explore through natural-language questions.
+◈ QueryMind
+Ask in plain English. Query your data. Discover insights.
+QueryMind is an AI-powered Text-to-SQL analytics assistant that connects natural-language questions to structured database results through a schema-aware query workflow.
 
-Built with Next.js, TypeScript, Node.js, PostgreSQL, and Gemini integration.
+Built with Next.js · TypeScript · Node.js · Express · PostgreSQL · Gemini
 
-Features · Architecture · Setup · API · Security
+Overview · Workflow · Architecture · Run Locally · API
 </div>
 
-🚀 Why QueryMind?
-Getting answers from a relational database often means knowing SQL, understanding table relationships, and writing queries manually. QueryMind explores a simpler workflow: ask a question in plain language, use database schema context to help generate SQL, validate the candidate query, and inspect the structured results in a dashboard.
+✦ Overview
+QueryMind is designed to make database analytics more accessible. Instead of starting with SQL syntax, a user starts with a question. The application sends that question to the backend, uses database context to guide AI-assisted SQL generation, validates the candidate query, and returns structured results for the interface to display.
+The experience
+Ask	Generate	Validate	Explore
+Write a question in natural language.	Use the configured Gemini integration to propose SQL.	Check the SQL before database execution.	View the returned data in the dashboard.
+
+
 Example questions
 - “How many customers are in the database?”
 - “Show the latest orders.”
 - “Which products have the most order items?”
 - “Summarize orders by month.”
-Results depend on the connected database, its schema and data, and the configured LLM provider.
+The answers depend on the schema, available data, LLM configuration, and query policy of the connected database.
+✦ Key capabilities
+- Natural-language analytics — express data questions without writing SQL from scratch.
+- LLM-assisted SQL generation — connect natural-language prompts to SQL using the configured Gemini integration.
+- Schema and knowledge context — ground query generation in database metadata and schema-knowledge components.
+- SQL parsing and validation — use validation components before a generated query is sent to the database.
+- Structured results — return query results to the frontend for review.
+- Dashboard and charting foundation — build the experience with Next.js/React and Recharts.
+- PostgreSQL data layer — use relational sample data and schema-knowledge storage.
+- Typed full-stack codebase — TypeScript on the frontend and backend.
+- Containerized local database — use Docker Compose for the development database.
+Implementation note: the architecture and feature descriptions document the project's intended end-to-end workflow. Actual behavior is determined by the current source code and configuration; validate each feature locally before presenting it as production-ready.
 
-✨ Features
-- Natural-language querying — express analytics questions in plain English.
-- LLM-assisted SQL generation — use a configured Gemini integration to help translate questions into SQL.
-- Schema-aware context — use database schema and knowledge components to ground query generation.
-- SQL validation components — parse and validate generated SQL before it reaches the database.
-- Interactive analytics UI — a Next.js/React interface for query workflows and result exploration.
-- Data visualization — Recharts integration for supported result visualizations.
-- PostgreSQL-backed data — relational sample tables and schema-knowledge storage.
-- Modular API — backend route modules for authentication, queries, analytics, and query history.
-- Containerized local database — Docker Compose support for a repeatable development setup.
-- TypeScript across the application — typed code across the frontend and backend.
-Feature availability depends on the current implementation and configuration. See the source code and scripts for the definitive behavior of each module.
-🧰 Tech Stack
-Area	Technologies
-Frontend	Next.js, React, TypeScript
-UI and charts	CSS, configured Tailwind utilities, Recharts
-Backend	Node.js, Express.js, TypeScript
-AI integration	Gemini configuration
-Database	PostgreSQL, pgvector-enabled PostgreSQL image
-SQL parsing	node-sql-parser
-Validation	Zod
-Database client	pg
-Local infrastructure	Docker Compose
-Developer tools	npm, Git, Postman
-
-
-Check frontend/package.json and backend/package.json for exact dependency versions and scripts.
-🏗️ How It Works
+✦ End-to-end workflow
 ```mermaid
 flowchart TD
-    U["User asks a question"] --> UI["Next.js dashboard"]
-    UI --> API["Node.js / Express API"]
-    API --> SC["Schema and knowledge context"]
-    SC --> LLM["Gemini-assisted SQL generation"]
-    LLM --> VAL["SQL parsing and validation"]
-    VAL --> DB[("PostgreSQL")]
-    DB --> RES["Structured query results"]
-    RES --> UI
-    API --> HIST["Query, analytics and history routes"]
+    A([User opens QueryMind]) --> B[Enter a natural-language question]
+    B --> C[Frontend validates input]
+    C --> D[Send request to Node.js / Express API]
+    D --> E[Load relevant database schema and knowledge]
+    E --> F[Gemini-assisted SQL generation]
+    F --> G{SQL passes validation?}
+    G -- No --> H[Return a safe validation error]
+    H --> B
+    G -- Yes --> I[Execute with configured PostgreSQL role]
+    I --> J{Database execution successful?}
+    J -- No --> K[Return a handled error]
+    K --> B
+    J -- Yes --> L[Return structured rows and metadata]
+    L --> M[Render results in the dashboard]
+    M --> N[Explore the result or ask another question]
+    N --> B
 ```
-Query lifecycle
-1. The user submits a natural-language question in the dashboard.
-2. The backend gathers relevant database schema or knowledge context.
-3. The configured LLM proposes a SQL query.
-4. The backend's validation components check the generated SQL.
-5. An accepted query is sent to PostgreSQL under the configured database permissions.
-6. The API returns structured results.
-7. The frontend presents the response in the supported table or chart view.
-Important: LLM-generated SQL must always be treated as untrusted input. Application validation should be backed by restrictive database permissions, timeouts, and result limits.
-📁 Project Structure
+Workflow, step by step
+1. Question input — the user describes the information they want.
+2. API request — the frontend sends the question to the backend.
+3. Context preparation — the backend retrieves relevant schema or stored schema knowledge.
+4. SQL generation — the configured LLM proposes a query based on the question and context.
+5. Validation gate — the backend checks the generated SQL before attempting execution.
+6. Database execution — an accepted query runs against the configured PostgreSQL database.
+7. Response handling — the backend returns structured data or a handled error.
+8. Results exploration — the frontend presents the response and lets the user continue the analysis.
+Generated SQL is untrusted input. The validation policy, database permissions, statement timeout, and result limits must be configured and tested together.
+✦ System architecture
+```mermaid
+flowchart LR
+    subgraph Client["Presentation layer"]
+        UI["Next.js / React UI"]
+        VIS["Tables and charts"]
+        UI --> VIS
+    end
+
+    subgraph Server["Application layer"]
+        API["Express REST API"]
+        ROUTES["Route handlers"]
+        CTX["Schema / knowledge context"]
+        LLM["Gemini integration"]
+        SAFE["SQL parser and validation"]
+        API --> ROUTES
+        ROUTES --> CTX
+        CTX --> LLM
+        LLM --> SAFE
+    end
+
+    subgraph Data["Data layer"]
+        PG[("PostgreSQL")]
+        KNOW[("Schema knowledge")]
+        PG --- KNOW
+    end
+
+    UI <--> API
+    SAFE --> PG
+    PG --> API
+    API --> VIS
+```
+Technology stack
+Layer	Technology	Responsibility
+Frontend	Next.js, React, TypeScript	Application interface and query experience
+Visualization	Recharts	Supported charts and data visualization
+Backend	Node.js, Express, TypeScript	API endpoints and request processing
+AI	Gemini integration	Natural-language-to-SQL generation
+Database	PostgreSQL	Relational data and query execution
+Vector support	pgvector-enabled PostgreSQL image	Vector-capable database foundation
+SQL parsing	node-sql-parser	SQL parsing and validation support
+Validation	Zod	Typed request/schema validation where configured
+Database client	pg	PostgreSQL connectivity
+Local environment	Docker Compose	Repeatable local database setup
+
+
+Check the frontend and backend package.json files for the exact installed versions and currently available scripts.
+✦ Repository layout
 QueryMind/
 ├── backend/
 │   ├── src/
-│   │   ├── config/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── scripts/
-│   │   └── services/
+│   │   ├── config/          # Database and AI configuration
+│   │   ├── middleware/      # Request middleware
+│   │   ├── routes/          # API route modules
+│   │   ├── scripts/         # Development and maintenance scripts
+│   │   └── services/        # Application service logic
 │   ├── package.json
 │   └── tsconfig.json
 ├── database/
-│   ├── init/
-│   ├── google-auth.sql
-│   └── ...
+│   ├── init/                # Database initialization scripts
+│   └── ...                  # Additional SQL setup files
 ├── frontend/
-│   ├── public/
+│   ├── public/              # Static assets
 │   ├── src/
-│   │   ├── app/
-│   │   └── lib/
+│   │   ├── app/             # Next.js application
+│   │   └── lib/             # Shared client utilities
 │   └── package.json
 ├── docker-compose.yml
 └── README.md
-The tree is a high-level guide; refer to the repository for the complete file layout.
-💻 Getting Started
+This is a high-level map. The checked-out repository is the source of truth for the complete tree.
+✦ Run locally
 Prerequisites
-Install the following:
-- Node.js compatible with the project's installed Next.js version
-- npm
+- Node.js and npm compatible with the project dependencies
 - Git
 - Docker Desktop with Docker Compose
-- A Gemini API key for the configured LLM integration
-Verify the tools:
-node --version
-npm --version
-git --version
-docker --version
-docker compose version
-1. Clone the repository
+- A Gemini API key for the configured AI integration
+1. Clone the project
 git clone https://github.com/Gautam0804/QueryMind.git
 cd QueryMind
 2. Configure environment variables
-Create the local environment files expected by the current backend, frontend, and Docker Compose configuration. The variable names below are illustrative—use the exact names read by the project source code.
-# Backend examples — verify names against backend/src/config/
+Create the local environment files required by the backend, frontend, and Docker Compose configuration. Use the exact variable names expected by the code.
+
+Example values for reference (verify the names and defaults in the configuration files):
+# Backend examples
 PORT=4000
 NODE_ENV=development
 DATABASE_URL=postgresql://DB_USER:DB_PASSWORD@localhost:15433/DB_NAME
 GEMINI_API_KEY=YOUR_API_KEY
 
-# Frontend example — verify against frontend/src/lib/api.ts
+# Frontend example
 NEXT_PUBLIC_API_URL=http://localhost:4000
-Never commit real API keys, passwords, access tokens, or production connection strings. Anything prefixed with NEXT_PUBLIC_ is exposed to the browser and must not contain secrets.
-
-Configuration references:
-- backend/src/config/db.ts — database configuration
-- backend/src/config/gemini.ts — LLM provider configuration
-- frontend/src/lib/api.ts — frontend API base URL
-- docker-compose.yml — database service and port configuration
-3. Start PostgreSQL
+Configuration references in the project include:
+- backend/src/config/db.ts
+- backend/src/config/gemini.ts
+- frontend/src/lib/api.ts
+- docker-compose.yml
+Never commit .env files or real credentials. Variables prefixed with NEXT_PUBLIC_ are exposed to the browser and must not contain secrets.
+3. Start the database
 From the repository root:
 docker compose up -d
 docker compose ps
-View logs if needed:
+Inspect database logs if the container is not healthy:
 docker compose logs
-The development setup has previously used pgvector/pgvector:pg16 with host port 15433 mapped to container port 5432. Confirm the current docker-compose.yml for the exact port, service name, and credentials.
-4. Install and run the backend
+The development setup has used the pgvector/pgvector:pg16 image and host port 15433 mapped to PostgreSQL's container port 5432. Confirm the current Compose file for the actual service name, port, database name, and credentials.
+4. Start the backend
 Open a terminal:
 cd backend
 npm install
 npm run dev
-The backend has previously been configured to start at http://localhost:4000. Use the URL printed in your terminal as the source of truth.
-5. Install and run the frontend
-Open a second terminal from the repository root:
+The backend has previously been configured for http://localhost:4000; use the URL printed by the running process.
+5. Start the frontend
+Open a second terminal from the project root:
 cd frontend
 npm install
 npm run dev
-The frontend has previously used http://localhost:3000. Open the address printed by Next.js.
-6. Verify the local setup
-If the health route is enabled in your current backend:
+The frontend has previously used http://localhost:3000; open the URL printed by Next.js.
+6. Verify the application
+If the health route is enabled in the current backend:
 Invoke-RestMethod http://localhost:4000/api/health
-Then open the frontend, submit a simple read-only analytics question, and check the API response and rendered results.
-🗄️ Database
-The database initialization scripts live under database/init/. The development schema has included tables such as:
+Then open the frontend and test a simple question against the configured sample database. Confirm that the request reaches the API, the generated SQL is validated, and the UI handles both successful results and errors.
+✦ Database
+The development schema has included the following tables:
 - customers
 - orders
 - order_items
 - products
 - schema_knowledge
-Use the SQL initialization scripts and the running database to confirm the current schema, relationships, constraints, and seed data.
+Initialization SQL is stored under database/init/. Review the current SQL files to confirm the schema, relationships, constraints, and sample records.
 
-If your Compose service is named postgres and the configured credentials match, list the tables with:
+If the Compose service is named postgres and the credentials match your local configuration, list the tables with:
 docker compose exec postgres psql -U querymind_admin -d querymind -c "\dt"
-Adjust the service name, database, and username if your configuration differs.
+Change the service name and credentials if your Compose configuration differs.
+Recommended execution model
+For analytics queries, use a dedicated database role with only the permissions the application needs. Read-only permissions should be combined with SQL validation, statement timeouts, connection limits, and result-size limits.
+✦ API reference
+The backend contains route modules for application workflows such as authentication, queries, analytics, and query history. Exact paths, methods, payloads, and response schemas should be confirmed in backend/src/routes/.
 
-For analytics workloads, use a dedicated least-privilege database role rather than administrator credentials. Database permissions should complement—not replace—application-level query validation.
-🔌 API
-The backend contains route modules for authentication, queries, analytics, and query history. The exact routes, HTTP methods, validation rules, and response schemas are defined in backend/src/routes/.
+A health endpoint has previously been used at:
+GET /api/health
+Base URL in local development: http://localhost:4000 (confirm the running server's output).
 
-The health endpoint has previously been tested at:
-GET http://localhost:4000/api/health
-Use the current route files as the source of truth before relying on any endpoint. For each route, API documentation should specify:
-- HTTP method and path
-- Authentication and authorization requirements
-- Request parameters or body
-- Successful response structure
+For a complete API reference, document each implemented route with:
+- Method and endpoint
+- Authentication requirements
+- Request parameters or JSON body
+- Successful response shape
 - Validation and error responses
-- Query execution constraints
-🛡️ Security Considerations
-Text-to-SQL applications must protect against unsafe or unexpectedly expensive generated queries. QueryMind includes SQL parsing/validation components, but the overall security of a deployment depends on the actual validation policy and database configuration.
+Do not assume a route is available solely because a related module or folder exists.
+✦ Reliability and security
+Text-to-SQL systems need explicit controls because an LLM may produce incorrect or unsafe SQL.
+- Treat all generated SQL as untrusted input.
+- Allow only the SQL statement types required by the application.
+- Reject unsupported multiple statements and data-modification operations.
+- Use a dedicated least-privilege database role.
+- Set query timeouts and bounded result sizes.
+- Apply validation again to any regenerated or corrected SQL.
+- Keep API keys and database credentials on the server.
+- Restrict CORS to trusted frontend origins.
+- Avoid logging secrets, access tokens, or sensitive query results.
+- Use HTTPS and managed secrets for deployment.
+These are operational requirements, not a claim that every safeguard is already enabled. Verify them in code and configuration before connecting the application to sensitive or production data.
+✦ Useful commands
+Run each command from the relevant folder. The package.json in that folder defines which scripts are available.
 
-Recommended safeguards:
-- Allow only the SQL statement types the product needs.
-- Reject unsupported multiple statements and data-modification statements.
-- Validate table and column references where appropriate.
-- Use a dedicated read-only database account for analytics.
-- Enforce database and statement timeouts, connection limits, and result-size limits.
-- Revalidate any SQL produced by a correction or retry flow.
-- Keep secrets on the server and out of source control.
-- Restrict CORS to trusted origins and protect authenticated endpoints.
-- Avoid logging credentials, tokens, or sensitive result data.
-- Use HTTPS and securely configured environment variables in production.
-Do not connect an LLM-generated query workflow to sensitive production data until the execution policy, permissions, and operational safeguards have been tested.
-🧪 Available Scripts
-Run commands from the corresponding directory and verify available scripts in each package.json.
-Frontend (frontend/)
-Command	Purpose
-npm run dev	Start the Next.js development server
-npm run build	Build the frontend for production
-npm run start	Start the built application
-npm run lint	Run the configured linter
-
-
-Backend (backend/)
-Command	Purpose
-npm run dev	Start the backend in development mode
-npm run build	Compile the TypeScript backend
-npm run start	Start the compiled server
-npm run typecheck	Run the configured TypeScript check
-npm test	Run the configured test script
-
-
-Scripts can vary as the project evolves; the package manifests define what is currently available.
-🔧 Troubleshooting
+Frontend
+cd frontend
+npm run dev
+npm run build
+npm run start
+npm run lint
+Backend
+cd backend
+npm run dev
+npm run build
+npm run start
+npm test
+If a command is not present in the relevant package's scripts, use the available script listed by npm run instead.
+✦ Troubleshooting
 <details>
-<summary><strong>Docker command is not recognized</strong></summary>
+<summary><strong>Docker is not recognized</strong></summary>
 
-Start Docker Desktop, confirm the Docker CLI is installed and on PATH, and open a new terminal after changing environment variables.
+Start Docker Desktop, confirm the Docker CLI is installed and available on PATH, then open a new terminal.
 </details>
 
 <details>
 <summary><strong>PostgreSQL connection fails</strong></summary>
 
 
-Run docker compose ps and docker compose logs. Confirm the host port, database name, username, password, and connection string match docker-compose.yml and the backend configuration.
+Check docker compose ps and docker compose logs. Verify the host port, database name, username, password, and connection string agree with the Compose and backend configuration.
 </details>
 
 <details>
-<summary><strong>Frontend cannot reach the backend</strong></summary>
+<summary><strong>The frontend cannot reach the API</strong></summary>
 
 
-Check frontend/src/lib/api.ts, confirm the API URL and backend port, and verify CORS configuration. A browser-exposed NEXT_PUBLIC_ variable must never contain a secret.
+Check the API base URL in frontend/src/lib/api.ts, confirm the backend is running, and review CORS settings.
 </details>
 
 <details>
 <summary><strong>Invalid or expired token</strong></summary>
 
 
-Review token creation, expiry, authorization headers, and server-side validation. Expired sessions should be handled safely; never log token contents.
+Review token issuance, expiry, authorization headers, and server-side validation. Handle expired sessions safely and never log token contents.
 </details>
 
 <details>
-<summary><strong>Generated SQL is invalid</strong></summary>
+<summary><strong>Generated SQL fails</strong></summary>
 
 
-Confirm that the relevant schema context reaches the LLM. Validate every generated query before execution and ensure correction attempts are also revalidated.
+Confirm the schema context and prompt are appropriate for the current database. Return a useful error to the user, and ensure every generated or regenerated query passes the same validation policy before execution.
 </details>
 
-<details>
-<summary><strong>Charts are empty or incorrect</strong></summary>
+✦ Demo and screenshots
+Add screenshots from the actual running application here to make the repository easier to evaluate:
+Dashboard	Query and results
+docs/images/dashboard.png	docs/images/query-results.png
 
 
-Inspect the API response shape and the fields consumed by chart components. Check empty data, numeric values, and unexpected result formats.
-</details>
+Replace these example paths with real screenshots committed to the repository. Do not use mock screenshots as evidence that the application is running.
+✦ Project status
+QueryMind brings together a web frontend, an API backend, a PostgreSQL data layer, and an AI-assisted Text-to-SQL workflow. To describe it as fully working, verify the end-to-end flow locally: database starts, frontend and backend run, a question generates a validated query, PostgreSQL returns results, and the interface displays them.
 
-🗺️ Development Roadmap
-Potential next steps for strengthening the project:
-- [ ] Add and document automated tests for SQL generation, validation, and execution.
-- [ ] Add CI checks for linting, type-checking, builds, and tests.
-- [ ] Publish a live demo and add screenshots or a short product walkthrough.
-- [ ] Document each API endpoint with concrete request and response examples.
-- [ ] Add explicit rate limits, query-cost controls, and result-size limits where missing.
-- [ ] Verify production deployment configuration, monitoring, and alerting.
-- [ ] Evaluate schema retrieval and semantic search quality with representative questions.
-- [ ] Add reliable query-result export and saved-query workflows if not already complete.
-Update this checklist as each item is implemented and verified.
-🤝 Contributing
-Suggestions and contributions are welcome.
-1. Fork the repository.
-2. Create a focused feature branch.
-3. Make the change and add or update tests where appropriate.
-4. Run the relevant lint, type-check, build, and test commands.
-5. Open a pull request describing the change and the checks you ran.
+A successful local smoke test is stronger evidence than a checklist of claimed completed features.
+✦ Contributing
+1. Fork the repository and create a focused branch.
+2. Make a small, well-scoped change.
+3. Add or update tests where appropriate.
+4. Run the available lint, type-check, build, and test scripts.
+5. Open a pull request with a clear description and test results.
 git checkout -b feature/your-feature
-Do not commit secrets, local environment files, dependencies, or generated build output.
-📄 License
-No repository license has been confirmed in this README. Until a LICENSE file is added, reuse and redistribution permissions are not explicitly granted. Add a license file if you intend to publish the project under open-source terms.
-👨‍💻 Author
-QueryMind — AI-powered Text-to-SQL analytics assistant
-
-GitHub repository: Gautam0804/QueryMind
+✦ License
+Add a LICENSE file if you intend to publish QueryMind under an open-source license. Without one, reuse and redistribution permissions are not explicitly granted.
 <div align="center">
 
-Built to explore a more accessible way to work with data.
+QueryMind · Making database analytics more approachable with AI.
+
+GitHub Repository
 </div>
